@@ -41,8 +41,27 @@ export const http = <T>(options: UniApp.RequestOptions) => {
   return new Promise<Data<T>>((resolve, reject) => {
     uni.request({
       ...options,
+      // 响应成功
       success(res) {
-        resolve(res.data as Data<T>)
+        if (res.statusCode >= 200 && res.statusCode < 300) {
+          resolve(res.data as Data<T>)
+        } else if (res.statusCode == 401) {
+          // 权限
+          reject(res)
+        } else {
+          uni.showToast({
+            title: 'xxx',
+          })
+          reject(res)
+        }
+      },
+      // 响应失败
+      fail(err) {
+        uni.showToast({
+          icon: 'none',
+          title: '网络错误',
+        })
+        reject(err)
       },
     })
   })
